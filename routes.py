@@ -43,17 +43,19 @@ def fetch_hansard():
             logging.error(f"Failed to parse JSON response: {str(e)}")
             return jsonify({"error": "Invalid response format from API"}), 500
 
-        results = data.get("results", [])
-        if not results:
-            logging.debug("No results found in API response")
+        # Check for rows instead of results
+        rows = data.get("rows", [])
+        if not rows:
+            logging.debug("No rows found in API response")
             return "No results found for your query.", 200
 
         formatted_lines = []
-        for item in results:
-            title = item.get('title', '')
-            snippet = item.get('snippet', '')
-            if title and snippet:
-                formatted_lines.append(f"{title}: {snippet}")
+        for item in rows:
+            body = item.get('body', '')
+            if body:
+                # Remove HTML tags and format the text
+                body = body.replace('<p>', '').replace('</p>', '\n')
+                formatted_lines.append(body)
 
         if not formatted_lines:
             return "No results found for your query.", 200
