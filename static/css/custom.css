@@ -1,0 +1,19 @@
+/* Custom styles to complement Bootstrap */
+.card {
+    background-color: var(--bs-dark);
+    border: 1px solid var(--bs-secondary);
+}
+
+#resultsContent {
+    white-space: pre-wrap;
+    font-family: var(--bs-font-monospace);
+    padding: 1rem;
+    background-color: var(--bs-dark);
+    border-radius: 0.375rem;
+}
+
+#resultsContent p {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--bs-secondary);
+}

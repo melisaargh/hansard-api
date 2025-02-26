@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hansard Search</title>
+    <!-- Bootstrap Replit Theme -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center mb-4">Hansard Search</h1>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form id="searchForm" class="mb-4">
+                            <div class="mb-3">
+                                <label for="query" class="form-label">Search Query</label>
+                                <input type="text" class="form-control" id="query" name="query" 
+                                       placeholder="Enter search term (e.g., encryption)" required>
+                            </div>
+                            <button type="submit" class="btn btn-secondary">Search</button>
+                        </form>
+                        
+                        <div id="results" class="mt-4">
+                            <h4>Results</h4>
+                            <div id="resultsContent" class="mt-3">
+                                <!-- Results will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = document.getElementById('query').value;
+            const resultsContent = document.getElementById('resultsContent');
+            
+            try {
+                resultsContent.innerHTML = 'Loading...';
+                const response = await fetch(`/fetch_hansard?query=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Failed to fetch data');
+                
+                const text = await response.text();
+                resultsContent.innerHTML = text.split('\n').map(line => 
+                    `<p class="mb-3">${line}</p>`
+                ).join('');
+            } catch (error) {
+                resultsContent.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
