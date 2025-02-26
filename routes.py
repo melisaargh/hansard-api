@@ -20,23 +20,36 @@ def fetch_hansard():
 
     try:
         # Fetch Hansard data from your FastAPI API
+        logging.debug(f"Making request to: {FASTAPI_URL}?query={query}")
         response = requests.get(f"{FASTAPI_URL}?query={query}")
         response.raise_for_status()
 
+        raw_data = response.text
+        logging.debug(f"Raw API response: {raw_data}")
+
         data = response.json()
-        logging.debug(f"Received API response: {data}")
+        logging.debug(f"Parsed API response: {data}")
 
-        if not data.get("results"):
+        # Check if we have results
+        results = data.get("results", [])
+        if not results:
+            logging.debug("No results found in API response")
             return "No results found for your query.", 200
 
-        # Format the response for GPT
-        formatted_text = "\n".join(
-            [f"{item.get('title', 'Untitled')}: {item.get('snippet', 'No snippet available')}" 
-             for item in data.get("results", [])]
-        )
+        # Format the response for display
+        formatted_lines = []
+        for item in results:
+            title = item.get('title', 'Untitled')
+            snippet = item.get('snippet', 'No snippet available')
+            if title and snippet:
+                formatted_lines.append(f"{title}: {snippet}")
 
-        if not formatted_text.strip():
+        if not formatted_lines:
+            logging.debug("No valid results after formatting")
             return "No results found for your query.", 200
+
+        formatted_text = "\n\n".join(formatted_lines)
+        logging.debug(f"Formatted response: {formatted_text[:200]}...")  # Log first 200 chars
 
         return formatted_text, 200
 
